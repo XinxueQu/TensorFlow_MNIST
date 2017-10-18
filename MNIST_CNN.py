@@ -20,6 +20,7 @@ def conv_layer(input, input_chs, output_chs, name="conv"):
     conv = tf.nn.conv2d(input, w, strides=[1, 1, 1, 1], padding="VALID") # w is the filter/kernel here
     act = tf.nn.relu(conv + b)
     return act
+
     # we do not need max-pooling here
     # tf.nn.max_pool(act, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="VALID")
 
