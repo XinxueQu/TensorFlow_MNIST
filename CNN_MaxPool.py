@@ -9,8 +9,8 @@ from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
 
 # Setting Training Parameters
-learning_rate = 0.001
-training_epochs = 100
+learning_rate = 0.0001
+training_epochs = 20000
 batch_size = 100
 
 def conv_layer(input, input_chs, output_chs, name="conv"):
@@ -19,10 +19,7 @@ def conv_layer(input, input_chs, output_chs, name="conv"):
     b = tf.Variable(tf.constant(0.1, shape=[output_chs]), name="B")
     conv = tf.nn.conv2d(input, w, strides=[1, 1, 1, 1], padding="VALID") # w is the filter/kernel here
     act = tf.nn.relu(conv + b)
-    return act
-
-    # we do not need max-pooling here
-    # tf.nn.max_pool(act, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="VALID")
+    return tf.nn.max_pool(act, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="SAME")
 
 def fc_layer(input, size_in, size_out, name="fc"):
   with tf.name_scope(name):
@@ -44,9 +41,9 @@ def mnist_model(learning_rate):
   conv2 = conv_layer(conv1, 64, 64, "conv2")    # 2nd C_layer
   conv_out = conv_layer(conv2, 64,64 , "conv3") # 3rd C_layer
 
-  flattened = tf.reshape(conv_out, [-1, 22 * 22 * 64])
+  flattened = tf.reshape(conv_out, [-1, 2 * 2 * 64])
 
-  fc1 = fc_layer(flattened, 22 * 22 * 64, 512, "fc1")
+  fc1 = fc_layer(flattened, 2 * 2 * 64, 512, "fc1")
 
   # Output Layer
   logits = fc_layer(fc1, 512, 10, "fc2")
@@ -74,7 +71,7 @@ def mnist_model(learning_rate):
 
   for i in range(training_epochs):
     batch = mnist.train.next_batch(batch_size)
-    if i % 20 == 0:
+    if i % 100 == 0:
       [train_accuracy, s] = sess.run([accuracy, summ], feed_dict={x: batch[0], y: batch[1]})
       print("Training Accuracy is:", train_accuracy)
       writer.add_summary(s, i)
@@ -83,5 +80,6 @@ def mnist_model(learning_rate):
   # Test model
   [Taccuracy, s] = sess.run([accuracy, summ], feed_dict={x: mnist.test.images, y: mnist.test.labels})
   print("Testing Accuracy is:", Taccuracy)
+
 
 mnist_model(learning_rate)
