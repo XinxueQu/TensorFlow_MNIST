@@ -63,8 +63,9 @@ def mnist_model(learning_rate):
   for i in range(training_epochs):
     batch = mnist.train.next_batch(batch_size)
     if i % 100 == 0:
-        [_, s] = sess.run([accuracy, summ], feed_dict={x: batch[0], y: batch[1]})
+        [TrainAccuracy, s] = sess.run([accuracy, summ], feed_dict={x: batch[0], y: batch[1]})
         writer.add_summary(s, i)
+        print("Training Accuracy is:", TrainAccuracy)
     sess.run(train_step, feed_dict={x: batch[0], y: batch[1]})
 
   # Test model
